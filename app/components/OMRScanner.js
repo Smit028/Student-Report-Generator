@@ -15,9 +15,9 @@ export default function OMRScanner() {
     }
 
     try {
-      // Try to access the back camera
+      // Try to access the back camera first
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: "environment" } } // Back camera
+        video: { facingMode: { exact: 'environment' } } // Attempt to use back camera
       });
       videoRef.current.srcObject = stream;
       setScanning(true);
@@ -28,7 +28,7 @@ export default function OMRScanner() {
       // Try to access the front camera as a fallback
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" } // Front camera
+          video: { facingMode: 'user' } // Use front camera as a fallback
         });
         videoRef.current.srcObject = stream;
         setScanning(true);
@@ -43,6 +43,7 @@ export default function OMRScanner() {
     const stream = videoRef.current.srcObject;
     const tracks = stream ? stream.getTracks() : [];
     tracks.forEach((track) => track.stop());
+    videoRef.current.srcObject = null; // Clear the video element source
     setScanning(false);
   };
 
