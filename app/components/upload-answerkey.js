@@ -4,21 +4,27 @@ import { db } from '../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 
 export default function UploadAnswerKey() {
-  const [answers, setAnswers] = useState(Array(50).fill('')); // Array to hold answers for questions 1 to 50
+  // Initialize answers with 'A' for each question
+  const [answers, setAnswers] = useState(Array(50).fill('A')); // Array to hold answers for questions 1 to 50
 
-  const handleChange = (index, value) => {
+  const handleCheckboxChange = (questionIndex, option) => {
     const newAnswers = [...answers];
-    newAnswers[index] = value; // Update the answer at the specific index
+    newAnswers[questionIndex] = option; // Update the answer at the specific index
     setAnswers(newAnswers);
   };
 
   const uploadAnswerKey = async () => {
     if (answers.every(answer => answer)) { // Ensure all answers are filled
-      await addDoc(collection(db, 'answerKey'), { answers });
-      alert('Answer key uploaded successfully!');
-      setAnswers(Array(50).fill('')); // Reset the answers after upload
+      try {
+        await addDoc(collection(db, 'answerKey'), { answers });
+        alert('Answer key uploaded successfully!');
+        setAnswers(Array(50).fill('A')); // Reset the answers after upload to all A
+      } catch (error) {
+        console.error('Error uploading answer key:', error);
+        alert('Failed to upload answer key. Please try again.');
+      }
     } else {
-      alert('Please fill in all answer fields.');
+      alert('Please select an answer for all questions.');
     }
   };
 
@@ -27,16 +33,23 @@ export default function UploadAnswerKey() {
       <h1 className="text-3xl font-bold mb-6">Upload Answer Key</h1>
 
       <div className="w-full max-w-2xl">
-        {answers.map((answer, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <label className="mr-2">Q{index + 1}:</label>
-            <input
-              type="text"
-              value={answer}
-              onChange={(e) => handleChange(index, e.target.value.toUpperCase())} // Convert input to uppercase
-              placeholder="A, B, C, D"
-              className="w-full p-2 border border-gray-400 rounded-lg"
-            />
+        {answers.map((answer, questionIndex) => (
+          <div key={questionIndex} className="flex items-center mb-4">
+            <label className="mr-4">Q{questionIndex + 1}:</label>
+            <div className="flex space-x-4">
+              {['A', 'B', 'C', 'D'].map((option) => (
+                <label key={option} className="flex items-center">
+                  <input
+                    type="radio"
+                    name={`question_${questionIndex}`} // Group radio buttons by question
+                    checked={answer === option} // Check if this option is selected
+                    onChange={() => handleCheckboxChange(questionIndex, option)} // Update answer on change
+                    className="mr-2"
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
           </div>
         ))}
       </div>
