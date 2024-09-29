@@ -1,49 +1,33 @@
 'use client'
-// gg
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css';
 
 export default function OMRScanner() {
   const videoRef = useRef(null);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState(null);
+  const [cameraFacingMode, setCameraFacingMode] = useState('environment'); // Default to back camera
 
   const startScanning = async () => {
-    // Check if navigator.mediaDevices is available
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       setError('Camera access is not supported in this browser.');
       return;
     }
 
     try {
-      // Attempt to access the back camera
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: 'environment' } } // Back camera
-      });
+      const constraints = {
+        video: {
+          facingMode: cameraFacingMode, // Use the selected camera mode
+        },
+      };
 
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       videoRef.current.srcObject = stream;
       setScanning(true);
+      setError(null); // Clear any previous errors
     } catch (error) {
-      console.error("Error accessing back camera:", error);
-
-      // Handle cases where exact facing mode is not available
-      if (error.name === "OverconstrainedError") {
-        setError("The specified camera (back camera) is not available. Trying front camera.");
-
-        // Try the front camera as a fallback
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'user' } // Front camera
-          });
-          videoRef.current.srcObject = stream;
-          setScanning(true);
-        } catch (err) {
-          console.error("Error accessing front camera:", err);
-          setError('Failed to access the front camera. Please check your settings.');
-        }
-      } else {
-        setError('Failed to access any camera. Please check your settings.');
-      }
+      console.error("Error accessing camera:", error);
+      setError('Failed to access the camera. Please check your settings.');
     }
   };
 
@@ -54,6 +38,20 @@ export default function OMRScanner() {
     videoRef.current.srcObject = null; // Clear the video element source
     setScanning(false);
   };
+
+  const switchCamera = () => {
+    // Toggle between back and front camera
+    setCameraFacingMode((prevMode) => (prevMode === 'environment' ? 'user' : 'environment'));
+    stopScanning(); // Stop scanning before switching
+    startScanning(); // Restart scanning with the new camera mode
+  };
+
+  useEffect(() => {
+    // Start scanning when the component mounts
+    if (scanning) {
+      startScanning();
+    }
+  }, [cameraFacingMode]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
@@ -69,10 +67,21 @@ export default function OMRScanner() {
         <video ref={videoRef} autoPlay playsInline className="rounded-lg w-full h-auto" />
       </div>
 
-      <button 
-        onClick={scanning ? stopScanning : startScanning} 
+      <div className="flex space-x-4 mt-6">
+        <button
+          onClick={switchCamera}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+        >
+          Switch Camera
+        </button>
+      </div>
+
+      <button
+        onClick={scanning ? stopScanning : startScanning}
         className={`mt-6 px-4 py-2 font-semibold rounded-lg shadow-md ${
-          scanning ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'} text-white`}>
+          scanning ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'
+        } text-white`}
+      >
         {scanning ? "Stop Scan" : "Start Scan"}
       </button>
     </div>
