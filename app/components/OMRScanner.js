@@ -15,25 +15,32 @@ export default function OMRScanner() {
     }
 
     try {
-      // Try to access the back camera first
+      // Attempt to access the back camera
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: 'environment' } } // Attempt to use back camera
+        video: { facingMode: { exact: 'environment' } } // Back camera
       });
+
       videoRef.current.srcObject = stream;
       setScanning(true);
     } catch (error) {
-      console.error("Failed to access back camera:", error);
-      setError('Failed to access the back camera, falling back to the front camera.');
+      console.error("Error accessing back camera:", error);
 
-      // Try to access the front camera as a fallback
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' } // Use front camera as a fallback
-        });
-        videoRef.current.srcObject = stream;
-        setScanning(true);
-      } catch (err) {
-        console.error("Failed to access front camera:", err);
+      // Handle cases where exact facing mode is not available
+      if (error.name === "OverconstrainedError") {
+        setError("The specified camera (back camera) is not available. Trying front camera.");
+
+        // Try the front camera as a fallback
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user' } // Front camera
+          });
+          videoRef.current.srcObject = stream;
+          setScanning(true);
+        } catch (err) {
+          console.error("Error accessing front camera:", err);
+          setError('Failed to access the front camera. Please check your settings.');
+        }
+      } else {
         setError('Failed to access any camera. Please check your settings.');
       }
     }
