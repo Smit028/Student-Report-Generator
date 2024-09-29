@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import 'tailwindcss/tailwind.css';
 
 export default function OMRScanner() {
@@ -7,26 +7,36 @@ export default function OMRScanner() {
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState(null);
 
-  const startScanning = () => {
+  const startScanning = async () => {
     // Check if navigator.mediaDevices is available
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       setError('Camera access is not supported in this browser.');
       return;
     }
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then((stream) => {
+    try {
+      // Try to access the back camera
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: "environment" } } // Back camera
+      });
+      videoRef.current.srcObject = stream;
+      setScanning(true);
+    } catch (error) {
+      console.error("Failed to access back camera:", error);
+      setError('Failed to access the back camera, falling back to the front camera.');
+
+      // Try to access the front camera as a fallback
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" } // Front camera
+        });
         videoRef.current.srcObject = stream;
         setScanning(true);
-      })
-      .catch((err) => {
-        console.error("Error accessing the camera: ", err);
-        if (err.name === 'NotAllowedError') {
-          setError('Permission denied. Please allow camera access to proceed.');
-        } else {
-          setError('Failed to access the camera. Please check your settings.');
-        }
-      });
+      } catch (err) {
+        console.error("Failed to access front camera:", err);
+        setError('Failed to access any camera. Please check your settings.');
+      }
+    }
   };
 
   const stopScanning = () => {
