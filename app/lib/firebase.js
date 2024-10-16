@@ -1,14 +1,11 @@
-// Import the functions you need from the SDKs you need
+// firebase.js or firebaseConfig.js
 import { initializeApp } from "firebase/app";
-import { getFirestore } from 'firebase/firestore';
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getDatabase } from "firebase/database";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyCZNza1ZLfJwzF4yL9sLQ1l-crE6fL1hHg",
   authDomain: "omr-scanner-6690b.firebaseapp.com",
+  databaseURL: "https://omr-scanner-6690b-default-rtdb.firebaseio.com",
   projectId: "omr-scanner-6690b",
   storageBucket: "omr-scanner-6690b.appspot.com",
   messagingSenderId: "359791323508",
@@ -18,7 +15,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const db = getDatabase(app); // Get a reference to the database
 
-const db = getFirestore(app);
+console.log(db); // Check if the database object is correctly initialized
 
-export { db };
+export default db;
