@@ -4,7 +4,7 @@ import db from "../lib/firebase";
 import { ref, get } from "firebase/database";
 import jsPDF from "jspdf"; // Import jsPDF
 import "jspdf-autotable"; // Import autotable plugin for jsPDF
-
+import StudentDropdown from "../components/dropdown";
 const ReportPage = () => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -18,6 +18,17 @@ const ReportPage = () => {
   const [allstudentsname, setallStudentsname] = useState([]); // To hold list of students
   const [selectedStudentId, setSelectedStudentId] = useState(); // To hold selected student ID
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const selectStudent = (name) => {
+    handleStudentChange({ target: { value: name } });
+    setIsOpen(false); // Close dropdown after selection
+  };
+  
   const names = [
     "ANIKET",
     "Aaron",
@@ -31,8 +42,6 @@ const ReportPage = () => {
     "Ayaan",
     "Baqir Raza",
     "Bhoi Shiv",
-    "DATE",
-    "DAY",
     "DHRUV MAKHIJA",
     "Dev Parikh",
     "Devansh More",
@@ -70,7 +79,6 @@ const ReportPage = () => {
     "Siddiqui Hamdan",
     "Smit parikh",
     "Suvadip Maity",
-    "TOTAL",
     "Tanisha",
     "Vaghela Yuvraj",
     "Vaishvi Adhiyol",
@@ -81,6 +89,8 @@ const ReportPage = () => {
     "pal",
     "patel vyapti",
   ];
+
+  
 
   const fetchStudentData = (studentId, fetchedData, tree) => {
     const allstudents = fetchedData[studentId]?.Sheet1;
@@ -135,7 +145,7 @@ const ReportPage = () => {
       return;
     }
     setStudentName(studentData["STUDENT NAME"]);
-    setStandard(studentData["STANDARD"] || "N/A");
+    setStandard(studentData["STANDARD"] || "12th Eng");
 
     const dateData = fetchedData[studentId]?.Sheet2?.["DATE"];
     const dayData = fetchedData[studentId]?.Sheet2?.["DAY"];
@@ -176,7 +186,7 @@ const ReportPage = () => {
       return;
     }
     setStudentName(studentData["STUDENT NAME"]);
-    setStandard(studentData["STANDARD"] || "N/A");
+    setStandard(studentData["STANDARD"] || "12th Eng");
 
     const dateData = fetchedData[studentId]?.Sheet3?.["DATE"];
     const dayData = fetchedData[studentId]?.Sheet3?.["DAY"];
@@ -217,7 +227,7 @@ const ReportPage = () => {
       return;
     }
     setStudentName(studentData["STUDENT NAME"]);
-    setStandard(studentData["STANDARD"] || "N/A");
+    setStandard(studentData["STANDARD"] || "12th Eng");
 
     const dateData = fetchedData[studentId]?.Sheet4?.["DATE"];
     const dayData = fetchedData[studentId]?.Sheet4?.["DAY"];
@@ -281,125 +291,140 @@ const ReportPage = () => {
   };
 
   const downloadReport = () => {
-    const tableData = report.map((entry) => [
-      entry.testName,
-      entry.date
-        ? `${entry.date.getDate().toString().padStart(2, "0")}/${(
-            entry.date.getMonth() + 1
-          )
-            .toString()
-            .padStart(2, "0")}/${entry.date.getFullYear()}`
-        : "N/A", // Format date
-      entry.day,
-      entry.marksObtained,
-      entry.totalMarks,
-    ]);
-
-    const tableData2 = chereport.map((entry) => [
-      entry.testName,
-      entry.date
-        ? `${entry.date.getDate().toString().padStart(2, "0")}/${(
-            entry.date.getMonth() + 1
-          )
-            .toString()
-            .padStart(2, "0")}/${entry.date.getFullYear()}`
-        : "N/A", // Format date
-      entry.day,
-      entry.marksObtained,
-      entry.totalMarks,
-    ]);
-
-    const tableData3 = mathreport.map((entry) => [
-      entry.testName,
-      entry.date
-        ? `${entry.date.getDate().toString().padStart(2, "0")}/${(
-            entry.date.getMonth() + 1
-          )
-            .toString()
-            .padStart(2, "0")}/${entry.date.getFullYear()}`
-        : "N/A", // Format date
-      entry.day,
-      entry.marksObtained,
-      entry.totalMarks,
-    ]);
-
-    const tableData4 = bioreport.map((entry) => [
-      entry.testName,
-      entry.date
-        ? `${entry.date.getDate().toString().padStart(2, "0")}/${(
-            entry.date.getMonth() + 1
-          )
-            .toString()
-            .padStart(2, "0")}/${entry.date.getFullYear()}`
-        : "N/A", // Format date
-      entry.day,
-      entry.marksObtained,
-      entry.totalMarks,
-    ]);
-
-    // Create the PDF document
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("Student Report", 14, 20);
-    doc.setFontSize(12);
-    doc.text(`Student Name: ${selectedStudentId}`, 14, 30);
-    doc.text(`Standard: ${standard}`, 14, 40);
-    doc.setFontSize(14);
-    doc.text("PHYSICS", 14, 50); // Additional header before tables
-
-    const spaceAfterHeader = 5; // Define space after header
-    const startYForFirstTable = 50 + spaceAfterHeader; // Calculate start position for first table
-
-    // First table
-    doc.autoTable({
-      head: [["Test Name", "Date", "Day", "Marks Obtained", "Total Marks"]],
-      body: tableData,
-      startY: startYForFirstTable, // Start position for the first table
-      theme: "grid",
-    });
-
-    // Add a header for the second table
-    const secondTableHeaderY = doc.lastAutoTable.finalY + 10; // Position after the first table
-    doc.setFontSize(14);
-    doc.text("CHEMISTRY", 14, secondTableHeaderY); // Header for second table
-
-    // Second table
-    doc.autoTable({
-      head: [["Test Name", "Date", "Day", "Marks Obtained", "Total Marks"]],
-      body: tableData2,
-      startY: secondTableHeaderY + 5, // Start below the header
-      theme: "grid",
-    });
-
-    // Add a header for the third table
-    const thirdTableHeaderY = doc.lastAutoTable.finalY + 10; // Position after the second table
-    doc.setFontSize(14);
-    doc.text("MATHS", 14, thirdTableHeaderY); // Header for third table
-
-    // Third table
-    doc.autoTable({
-      head: [["Test Name", "Date", "Day", "Marks Obtained", "Total Marks"]],
-      body: tableData3,
-      startY: thirdTableHeaderY + 5, // Start below the header
-      theme: "grid",
-    });
-
-    // Add a header for the fourth table
-    const fourthTableHeaderY = doc.lastAutoTable.finalY + 10; // Position after the third table
-    doc.setFontSize(14);
-    doc.text("BIOLOGY", 14, fourthTableHeaderY); // Header for fourth table
-
-    // Fourth table
-    doc.autoTable({
-      head: [["Test Name", "Date", "Day", "Marks Obtained", "Total Marks"]],
-      body: tableData4,
-      startY: fourthTableHeaderY + 5, // Start below the header
-      theme: "grid",
-    });
-
-    // Save the PDF
-    doc.save(`${studentName}_Report.pdf`);
+    try {
+      const tableData = report.map((entry) => [
+        entry.testName,
+        entry.date
+          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(
+              entry.date.getMonth() + 1
+            )
+              .toString()
+              .padStart(2, "0")}/${entry.date.getFullYear()}`
+          : "N/A",
+        entry.day,
+        entry.marksObtained,
+        entry.totalMarks,
+      ]);
+  
+      const tableData2 = chereport.map((entry) => [
+        entry.testName,
+        entry.date
+          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(
+              entry.date.getMonth() + 1
+            )
+              .toString()
+              .padStart(2, "0")}/${entry.date.getFullYear()}`
+          : "N/A",
+        entry.day,
+        entry.marksObtained,
+        entry.totalMarks,
+      ]);
+  
+      const tableData3 = mathreport.map((entry) => [
+        entry.testName,
+        entry.date
+          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(
+              entry.date.getMonth() + 1
+            )
+              .toString()
+              .padStart(2, "0")}/${entry.date.getFullYear()}`
+          : "N/A",
+        entry.day,
+        entry.marksObtained,
+        entry.totalMarks,
+      ]);
+  
+      const tableData4 = bioreport.map((entry) => [
+        entry.testName,
+        entry.date
+          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(
+              entry.date.getMonth() + 1
+            )
+              .toString()
+              .padStart(2, "0")}/${entry.date.getFullYear()}`
+          : "N/A",
+        entry.day,
+        entry.marksObtained,
+        entry.totalMarks,
+      ]);
+  
+      // Create the PDF document
+      const doc = new jsPDF();
+  
+      // Set a serif font for a classic look
+      doc.setFont("times", "normal");
+  
+      // Document title
+      doc.setFontSize(22);
+      doc.setTextColor(40);
+      doc.text("ACI Student Report", 105, 30, { align: "center" });
+  
+      // Student details
+      doc.setFontSize(14);
+      doc.setFont("times", "bold");
+      doc.text(`Student Name: ${studentName}`, 14, 40);
+      doc.text(`Standard: 12th Eng`, 14, 50);
+  
+      // Add a line break for spacing
+      doc.setLineWidth(0.5);
+      doc.line(14, 55, 196, 55);
+  
+      const sectionSpacing = 0;
+  
+      // Function to add a section with a table if data is not empty
+      const addSection = (title, color, data) => {
+        if (data.length > 0) {
+          let startY = doc.lastAutoTable ? doc.lastAutoTable.finalY + sectionSpacing : 65; // Starting position
+  
+          // Set header color and style
+          doc.setFontSize(16);
+          doc.setFont("times", "bold");
+          doc.setTextColor(...color); // Set color for the header
+          doc.autoTable({
+            head: [[{ content: title, colSpan: 5, styles: { halign: 'center', fontSize: 14, bodyColor: color  } }]], // Single row header spanning 5 columns
+            startY: startY,
+            theme: "grid",
+            margin: { top: 10 },
+            styles: {
+              halign: 'center', // Center align header text
+              lineWidth:0.15,
+              lineColor: [200, 200, 200]
+            },
+          });
+  
+          // Table data styling
+          startY += 9.1; // Adjust to remove space between header and table
+          doc.setFontSize(12);
+          doc.setFont("times", "normal");
+          doc.autoTable({
+            head: [["Test Name", "Date", "Day", "Marks Obtained", "Total Marks"]],
+            body: data,
+            startY: startY,
+            theme: "grid",
+            styles: {
+              halign: 'center', // Center align table data
+              lineWidth:0.15,
+              lineColor: [200, 200, 200]
+            },
+          });
+        }
+      };
+  
+      // Add sections for each subject with colors
+      addSection("PHYSICS", [0, 0, 255], tableData); // Blue header for Physics
+      addSection("CHEMISTRY", [0, 128, 0], tableData2); // Green header for Chemistry
+      addSection("MATHS", [255, 165, 0], tableData3); // Orange header for Maths
+      addSection("BIOLOGY", [255, 0, 0], tableData4); // Red header for Biology
+  
+      // Save the PDF
+      doc.save(`${studentName}_Report.pdf`);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
   };
+  
+  
+  
 
   return (
     <div className="flex flex-col items-center bg-white text-black min-h-screen p-4">
@@ -409,7 +434,7 @@ const ReportPage = () => {
         <div className="w-full max-w-4xl md:w-[210mm] min-h-[400mm] h-full border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-lg">
           <h2 className="mb-4 text-center text-2xl font-semibold text-gray-700">Student Report</h2>
           <div className="mb-4 text-center">
-            <select
+            {/* <select
               value={selectedStudentId}
               onChange={handleStudentChange}
               className="mb-4 p-2 border border-gray-300 rounded w-full md:w-1/2 bg-white"
@@ -422,7 +447,40 @@ const ReportPage = () => {
                   {name}
                 </option>
               ))}
-            </select>
+            </select> */}
+            {/* <div className="relative mb-4">
+      <button
+        onClick={toggleDropdown}
+        className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none w-full md:w-1/2"
+        type="button"
+      >
+        {selectedStudentId || 'Select a student'}
+      </button>
+      {isOpen && (
+        <ul
+          role="menu"
+          className="absolute z-10 min-w-[180px] overflow-auto rounded-lg border border-slate-200 bg-white p-1.5 shadow-lg focus:outline-none"
+        >
+          {names.map((name, index) => (
+            <li
+              key={index}
+              role="menuitem"
+              onClick={() => selectStudent(name)}
+              className="cursor-pointer text-slate-800 flex w-full text-sm items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
+            >
+              {name}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div> */}
+    
+
+    <StudentDropdown
+        names={names}
+        selectedStudentId={selectedStudentId}
+        handleStudentChange={handleStudentChange}
+      />
             <p className="text-lg">
               <strong>Student Name:</strong> {selectedStudentId}
             </p>
@@ -432,10 +490,11 @@ const ReportPage = () => {
           </div>
           <button
             onClick={downloadReport}
-            className="mb-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition duration-300 w-full md:w-auto"
+            className="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
           >
             Download Report as PDF
           </button>
+      
           {report.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full border-collapse border border-gray-300 rounded-lg bg-white text-black">
@@ -455,6 +514,108 @@ const ReportPage = () => {
                 </thead>
                 <tbody>
                   {report.map((entry, index) => (
+                    <tr key={index} className="hover:bg-gray-100">
+                      <td className="border border-gray-300 p-2 text-center">{entry.testName}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.date
+                          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(entry.date.getMonth() + 1)
+                              .toString()
+                              .padStart(2, "0")}/${entry.date.getFullYear()}`
+                          : "N/A"}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">{entry.day}</td>
+                      <td className="border border-gray-300 p-2 text-center">{entry.marksObtained}</td>
+                      <td className="border border-gray-300 p-2 text-center">{entry.totalMarks}</td>
+                    </tr>
+                  ))}
+                </tbody>
+
+                {/* Chemistrt */}
+
+                <thead>
+                  <tr>
+                    <th colSpan="5" className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600">
+                      CHEMISTRY
+                    </th>
+                  </tr>
+                  <tr>
+                    <th className="border border-gray-300 p-2 text-center">Test Name</th>
+                    <th className="border border-gray-300 p-2 text-center">Date</th>
+                    <th className="border border-gray-300 p-2 text-center">Day</th>
+                    <th className="border border-gray-300 p-2 text-center">Marks Obtained</th>
+                    <th className="border border-gray-300 p-2 text-center">Total Marks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {chereport.map((entry, index) => (
+                    <tr key={index} className="hover:bg-gray-100">
+                      <td className="border border-gray-300 p-2 text-center">{entry.testName}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.date
+                          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(entry.date.getMonth() + 1)
+                              .toString()
+                              .padStart(2, "0")}/${entry.date.getFullYear()}`
+                          : "N/A"}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">{entry.day}</td>
+                      <td className="border border-gray-300 p-2 text-center">{entry.marksObtained}</td>
+                      <td className="border border-gray-300 p-2 text-center">{entry.totalMarks}</td>
+                    </tr>
+                  ))}
+                </tbody>
+
+                {/* Maths */}
+
+                <thead>
+                  <tr>
+                    <th colSpan="5" className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600">
+                      MATHS
+                    </th>
+                  </tr>
+                  <tr>
+                    <th className="border border-gray-300 p-2 text-center">Test Name</th>
+                    <th className="border border-gray-300 p-2 text-center">Date</th>
+                    <th className="border border-gray-300 p-2 text-center">Day</th>
+                    <th className="border border-gray-300 p-2 text-center">Marks Obtained</th>
+                    <th className="border border-gray-300 p-2 text-center">Total Marks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mathreport.map((entry, index) => (
+                    <tr key={index} className="hover:bg-gray-100">
+                      <td className="border border-gray-300 p-2 text-center">{entry.testName}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.date
+                          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(entry.date.getMonth() + 1)
+                              .toString()
+                              .padStart(2, "0")}/${entry.date.getFullYear()}`
+                          : "N/A"}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">{entry.day}</td>
+                      <td className="border border-gray-300 p-2 text-center">{entry.marksObtained}</td>
+                      <td className="border border-gray-300 p-2 text-center">{entry.totalMarks}</td>
+                    </tr>
+                  ))}
+                </tbody>
+
+                {/* Biology */}
+
+                <thead>
+                  <tr>
+                    <th colSpan="5" className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600">
+                      BIOLOGY
+                    </th>
+                  </tr>
+                  <tr>
+                    <th className="border border-gray-300 p-2 text-center">Test Name</th>
+                    <th className="border border-gray-300 p-2 text-center">Date</th>
+                    <th className="border border-gray-300 p-2 text-center">Day</th>
+                    <th className="border border-gray-300 p-2 text-center">Marks Obtained</th>
+                    <th className="border border-gray-300 p-2 text-center">Total Marks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bioreport.map((entry, index) => (
                     <tr key={index} className="hover:bg-gray-100">
                       <td className="border border-gray-300 p-2 text-center">{entry.testName}</td>
                       <td className="border border-gray-300 p-2 text-center">
