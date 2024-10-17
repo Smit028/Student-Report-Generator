@@ -47,7 +47,7 @@ export default function Home() {
     className="cursor-pointer flex-col items-center justify-center shadow-2xl whitespace-nowrap text-2xl p-6 lg:p-8 lg:w-1/4"
     gradientColor={"#D9D9D955"}
   >
-    11th Gujarati
+    <Link href="/egm" passHref> 11th Gujrati</Link>
   </MagicCard>
 </div>
 

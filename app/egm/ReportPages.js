@@ -29,66 +29,40 @@ const ReportPage = () => {
     setIsOpen(false); // Close dropdown after selection
   };
 
-  const names = [
-    "ANIKET",
-    "Aaron",
-    "Abuturak",
-    "Adityaraj",
-    "Amaan",
-    "Aneri Prajapati",
-    "Anjali Kadam",
-    "Arzoo Dabhi",
-    "Athul Nair",
-    "Ayaan",
-    "Baqir Raza",
-    "Bhoi Shiv",
-    "DHRUV MAKHIJA",
-    "Dev Parikh",
-    "Devansh More",
-    "Dhriti Shah",
-    "Goswami Hetvi",
-    "Grisha Patel",
-    "Griva Patel",
-    "Harik Chokshi",
-    "Helly",
-    "Kavish Shah",
-    "Keval Panchal",
-    "Khushi Amin",
-    "Krisha Sheth",
-    "Krupa Rathi",
-    "Manav",
-    "Mehta Prachi",
-    "NIV PATEL",
-    "Nakiya Vohra",
-    "Nil Solanki",
-    "OM Soni",
-    "Patel Riya",
-    "Pranjali",
-    "Rehan Pathan",
-    "Rhythm Modi",
-    "Rohan Gokhale",
-    "Ronak Borana",
-    "Rudra More",
-    "Sahil Parmar",
-    "Saiyed Mohammed Lava",
-    "Sana",
-    "Shakshi Roy",
-    "Shibsundar",
-    "Shivam Bhatt",
-    "Shivani",
-    "Siddiqui Hamdan",
-    "Smit parikh",
-    "Suvadip Maity",
-    "Tanisha",
-    "Vaghela Yuvraj",
-    "Vaishvi Adhiyol",
-    "Vansh",
-    "Vivek Sanjaybhai Vasule",
-    "Zaahra Kathawala",
-    "Zaminraza Momin",
-    "pal",
-    "patel vyapti",
-  ];
+  const names=[
+    "Aayushi",
+    "Bhakti",
+    "DAY",
+    "Devanshi Khaire",
+    "Dhara",
+    "Dharmik",
+    "Dhruvin Kadopara",
+    "Disha",
+    "Divyanshi Leua",
+    "Ishika Shrimali",
+    "Jenil Prajapati",
+    "Kansih",
+    "Kirti Chauhan",
+    "Meghna Sunsara",
+    "Om Gaykwad",
+    "Om Parmar",
+    "Priyanka Rathod",
+    "Priyanshi Suryavanshi",
+    "Riya Chauhan",
+    "Sonu",
+    "Utkarsh Bihola",
+    "Vanshika Makwana",
+    "Vanshika sharma",
+    "dhruvi patel",
+    "divyesh rana",
+    "honey vaghela",
+    "janvi sonvane",
+    "nanavati shreyansh",
+    "pithadiya dharitri",
+    "shubhangi chavda",
+    "yashasvi darji",
+    "yug parmar"
+]
 
   const fetchStudentData = (studentId, fetchedData, tree) => {
     const allstudents = fetchedData[studentId]?.Sheet1;
@@ -102,7 +76,7 @@ const ReportPage = () => {
       return;
     }
     setStudentName(studentData["STUDENT NAME"]);
-    setStandard(studentData["STANDARD"] || "12th Eng");
+    setStandard(studentData["STANDARD"] || "11th Guj");
 
     const dateData = fetchedData[studentId]?.Sheet1?.["DATE"];
     const dayData = fetchedData[studentId]?.Sheet1?.["DAY"];
@@ -143,7 +117,7 @@ const ReportPage = () => {
       return;
     }
     setStudentName(studentData["STUDENT NAME"]);
-    setStandard(studentData["STANDARD"] || "12th Eng");
+    setStandard(studentData["STANDARD"] || "11th Guj");
 
     const dateData = fetchedData[studentId]?.Sheet2?.["DATE"];
     const dayData = fetchedData[studentId]?.Sheet2?.["DAY"];
@@ -184,7 +158,7 @@ const ReportPage = () => {
       return;
     }
     setStudentName(studentData["STUDENT NAME"]);
-    setStandard(studentData["STANDARD"] || "12th Eng");
+    setStandard(studentData["STANDARD"] || "11th Guj");
 
     const dateData = fetchedData[studentId]?.Sheet3?.["DATE"];
     const dayData = fetchedData[studentId]?.Sheet3?.["DAY"];
@@ -215,9 +189,9 @@ const ReportPage = () => {
 
   const fetchbioStudentData = (studentId, fetchedData, tree) => {
     const allstudents = fetchedData[studentId]?.Sheet1;
-    // const studentKeys = Object.keys(allstudents); // Get all keys from allstudents
-    // setallStudentsname(studentKeys)
-    // console.log("Keys of allstudents:", allstudentsname);
+    const studentKeys = Object.keys(allstudents); // Get all keys from allstudents
+    setallStudentsname(studentKeys)
+    console.log("Keys of allstudents:", allstudentsname);
 
     const studentData = fetchedData[studentId]?.Sheet4?.[tree];
     if (!studentData) {
@@ -225,7 +199,7 @@ const ReportPage = () => {
       return;
     }
     setStudentName(studentData["STUDENT NAME"]);
-    setStandard(studentData["STANDARD"] || "12th Eng");
+    setStandard(studentData["STANDARD"] || "11th Guj");
 
     const dateData = fetchedData[studentId]?.Sheet4?.["DATE"];
     const dayData = fetchedData[studentId]?.Sheet4?.["DAY"];
@@ -282,10 +256,10 @@ const ReportPage = () => {
   const handleStudentChange = (e) => {
     const studentIds = Object.keys(data);
     setSelectedStudentId(e.target.value);
-    fetchStudentData(studentIds[1], data, e.target.value);
-    fetchchemStudentData(studentIds[1], data, e.target.value);
-    fetchmathStudentData(studentIds[1], data, e.target.value);
-    fetchbioStudentData(studentIds[1], data, e.target.value);
+    fetchStudentData(studentIds[0], data, e.target.value);
+    fetchchemStudentData(studentIds[0], data, e.target.value);
+    fetchmathStudentData(studentIds[0], data, e.target.value);
+    fetchbioStudentData(studentIds[0], data, e.target.value);
   };
 
   const downloadReport = () => {
@@ -361,7 +335,7 @@ const ReportPage = () => {
       doc.setFontSize(14);
       doc.setFont("times", "bold");
       doc.text(`Student Name: ${studentName}`, 14, 40);
-      doc.text(`Standard: 12th Eng`, 14, 50);
+      doc.text(`Standard: 11th Guj`, 14, 50);
   
       // Add a line break for spacing
       doc.setLineWidth(0.5);
