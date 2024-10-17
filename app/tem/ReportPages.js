@@ -28,7 +28,7 @@ const ReportPage = () => {
     handleStudentChange({ target: { value: name } });
     setIsOpen(false); // Close dropdown after selection
   };
-  
+
   const names = [
     "ANIKET",
     "Aaron",
@@ -89,8 +89,6 @@ const ReportPage = () => {
     "pal",
     "patel vyapti",
   ];
-
-  
 
   const fetchStudentData = (studentId, fetchedData, tree) => {
     const allstudents = fetchedData[studentId]?.Sheet1;
@@ -369,42 +367,53 @@ const ReportPage = () => {
       doc.setLineWidth(0.5);
       doc.line(14, 55, 196, 55);
   
-      const sectionSpacing = 0;
-  
       // Function to add a section with a table if data is not empty
       const addSection = (title, color, data) => {
         if (data.length > 0) {
-          let startY = doc.lastAutoTable ? doc.lastAutoTable.finalY + sectionSpacing : 65; // Starting position
+          let startY = doc.lastAutoTable
+            ? doc.lastAutoTable.finalY // Start at the end of the last table
+            : 65; // Starting position if no tables exist
   
           // Set header color and style
           doc.setFontSize(16);
           doc.setFont("times", "bold");
           doc.setTextColor(...color); // Set color for the header
           doc.autoTable({
-            head: [[{ content: title, colSpan: 5, styles: { halign: 'center', fontSize: 14, bodyColor: color  } }]], // Single row header spanning 5 columns
+            head: [
+              [
+                {
+                  content: title,
+                  colSpan: 5,
+                  styles: { halign: "center", fontSize: 14, bodyColor: color },
+                },
+              ],
+            ], // Single row header spanning 5 columns
             startY: startY,
             theme: "grid",
             margin: { top: 10 },
             styles: {
-              halign: 'center', // Center align header text
-              lineWidth:0.15,
-              lineColor: [200, 200, 200]
+              halign: "center", // Center align header text
+              lineWidth: 0.15,
+              lineColor: [200, 200, 200],
             },
           });
   
           // Table data styling
-          startY += 9.1; // Adjust to remove space between header and table
+          startY = doc.lastAutoTable.finalY; // Set startY to the end of the header
+  
           doc.setFontSize(12);
           doc.setFont("times", "normal");
           doc.autoTable({
-            head: [["Test Name", "Date", "Day", "Marks Obtained", "Total Marks"]],
+            head: [
+              ["Test Name", "Date", "Day", "Marks Obtained", "Total Marks"],
+            ],
             body: data,
             startY: startY,
             theme: "grid",
             styles: {
-              halign: 'center', // Center align table data
-              lineWidth:0.15,
-              lineColor: [200, 200, 200]
+              halign: "center", // Center align table data
+              lineWidth: 0.15,
+              lineColor: [200, 200, 200],
             },
           });
         }
@@ -424,7 +433,6 @@ const ReportPage = () => {
   };
   
   
-  
 
   return (
     <div className="flex flex-col items-center bg-white text-black min-h-screen p-4">
@@ -432,55 +440,15 @@ const ReportPage = () => {
         <div className="text-red-500">{error}</div>
       ) : data ? (
         <div className="w-full max-w-4xl md:w-[210mm] min-h-[400mm] h-full border border-gray-300 rounded-lg p-4 bg-gray-50 shadow-lg">
-          <h2 className="mb-4 text-center text-2xl font-semibold text-gray-700">Student Report</h2>
+          <h2 className="mb-4 text-center text-2xl font-semibold text-gray-700">
+            Student Report
+          </h2>
           <div className="mb-4 text-center">
-            {/* <select
-              value={selectedStudentId}
-              onChange={handleStudentChange}
-              className="mb-4 p-2 border border-gray-300 rounded w-full md:w-1/2 bg-white"
-            >
-              <option value="" disabled>
-                Select a student
-              </option>
-              {names.map((name, index) => (
-                <option key={index} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select> */}
-            {/* <div className="relative mb-4">
-      <button
-        onClick={toggleDropdown}
-        className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none w-full md:w-1/2"
-        type="button"
-      >
-        {selectedStudentId || 'Select a student'}
-      </button>
-      {isOpen && (
-        <ul
-          role="menu"
-          className="absolute z-10 min-w-[180px] overflow-auto rounded-lg border border-slate-200 bg-white p-1.5 shadow-lg focus:outline-none"
-        >
-          {names.map((name, index) => (
-            <li
-              key={index}
-              role="menuitem"
-              onClick={() => selectStudent(name)}
-              className="cursor-pointer text-slate-800 flex w-full text-sm items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100"
-            >
-              {name}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div> */}
-    
-
-    <StudentDropdown
-        names={names}
-        selectedStudentId={selectedStudentId}
-        handleStudentChange={handleStudentChange}
-      />
+            <StudentDropdown
+              names={names}
+              selectedStudentId={selectedStudentId}
+              handleStudentChange={handleStudentChange}
+            />
             <p className="text-lg">
               <strong>Student Name:</strong> {selectedStudentId}
             </p>
@@ -494,38 +462,62 @@ const ReportPage = () => {
           >
             Download Report as PDF
           </button>
-      
+
           {report.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full border-collapse border border-gray-300 rounded-lg bg-white text-black">
                 <thead>
                   <tr>
-                    <th colSpan="5" className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600">
+                    <th
+                      colSpan="5"
+                      className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600"
+                    >
                       PHYSICS
                     </th>
                   </tr>
                   <tr>
-                    <th className="border border-gray-300 p-2 text-center">Test Name</th>
-                    <th className="border border-gray-300 p-2 text-center">Date</th>
-                    <th className="border border-gray-300 p-2 text-center">Day</th>
-                    <th className="border border-gray-300 p-2 text-center">Marks Obtained</th>
-                    <th className="border border-gray-300 p-2 text-center">Total Marks</th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Test Name
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Date
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Day
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Marks Obtained
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Total Marks
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {report.map((entry, index) => (
                     <tr key={index} className="hover:bg-gray-100">
-                      <td className="border border-gray-300 p-2 text-center">{entry.testName}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.testName}
+                      </td>
                       <td className="border border-gray-300 p-2 text-center">
                         {entry.date
-                          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(entry.date.getMonth() + 1)
+                          ? `${entry.date
+                              .getDate()
+                              .toString()
+                              .padStart(2, "0")}/${(entry.date.getMonth() + 1)
                               .toString()
                               .padStart(2, "0")}/${entry.date.getFullYear()}`
                           : "N/A"}
                       </td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.day}</td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.marksObtained}</td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.totalMarks}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.day}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.marksObtained}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.totalMarks}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -534,32 +526,56 @@ const ReportPage = () => {
 
                 <thead>
                   <tr>
-                    <th colSpan="5" className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600">
+                    <th
+                      colSpan="5"
+                      className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600"
+                    >
                       CHEMISTRY
                     </th>
                   </tr>
                   <tr>
-                    <th className="border border-gray-300 p-2 text-center">Test Name</th>
-                    <th className="border border-gray-300 p-2 text-center">Date</th>
-                    <th className="border border-gray-300 p-2 text-center">Day</th>
-                    <th className="border border-gray-300 p-2 text-center">Marks Obtained</th>
-                    <th className="border border-gray-300 p-2 text-center">Total Marks</th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Test Name
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Date
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Day
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Marks Obtained
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Total Marks
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {chereport.map((entry, index) => (
                     <tr key={index} className="hover:bg-gray-100">
-                      <td className="border border-gray-300 p-2 text-center">{entry.testName}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.testName}
+                      </td>
                       <td className="border border-gray-300 p-2 text-center">
                         {entry.date
-                          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(entry.date.getMonth() + 1)
+                          ? `${entry.date
+                              .getDate()
+                              .toString()
+                              .padStart(2, "0")}/${(entry.date.getMonth() + 1)
                               .toString()
                               .padStart(2, "0")}/${entry.date.getFullYear()}`
                           : "N/A"}
                       </td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.day}</td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.marksObtained}</td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.totalMarks}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.day}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.marksObtained}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.totalMarks}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -568,32 +584,56 @@ const ReportPage = () => {
 
                 <thead>
                   <tr>
-                    <th colSpan="5" className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600">
+                    <th
+                      colSpan="5"
+                      className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600"
+                    >
                       MATHS
                     </th>
                   </tr>
                   <tr>
-                    <th className="border border-gray-300 p-2 text-center">Test Name</th>
-                    <th className="border border-gray-300 p-2 text-center">Date</th>
-                    <th className="border border-gray-300 p-2 text-center">Day</th>
-                    <th className="border border-gray-300 p-2 text-center">Marks Obtained</th>
-                    <th className="border border-gray-300 p-2 text-center">Total Marks</th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Test Name
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Date
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Day
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Marks Obtained
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Total Marks
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {mathreport.map((entry, index) => (
                     <tr key={index} className="hover:bg-gray-100">
-                      <td className="border border-gray-300 p-2 text-center">{entry.testName}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.testName}
+                      </td>
                       <td className="border border-gray-300 p-2 text-center">
                         {entry.date
-                          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(entry.date.getMonth() + 1)
+                          ? `${entry.date
+                              .getDate()
+                              .toString()
+                              .padStart(2, "0")}/${(entry.date.getMonth() + 1)
                               .toString()
                               .padStart(2, "0")}/${entry.date.getFullYear()}`
                           : "N/A"}
                       </td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.day}</td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.marksObtained}</td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.totalMarks}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.day}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.marksObtained}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.totalMarks}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -602,41 +642,67 @@ const ReportPage = () => {
 
                 <thead>
                   <tr>
-                    <th colSpan="5" className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600">
+                    <th
+                      colSpan="5"
+                      className="border border-gray-300 p-2 text-center text-xl font-medium text-gray-600"
+                    >
                       BIOLOGY
                     </th>
                   </tr>
                   <tr>
-                    <th className="border border-gray-300 p-2 text-center">Test Name</th>
-                    <th className="border border-gray-300 p-2 text-center">Date</th>
-                    <th className="border border-gray-300 p-2 text-center">Day</th>
-                    <th className="border border-gray-300 p-2 text-center">Marks Obtained</th>
-                    <th className="border border-gray-300 p-2 text-center">Total Marks</th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Test Name
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Date
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Day
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Marks Obtained
+                    </th>
+                    <th className="border border-gray-300 p-2 text-center">
+                      Total Marks
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {bioreport.map((entry, index) => (
                     <tr key={index} className="hover:bg-gray-100">
-                      <td className="border border-gray-300 p-2 text-center">{entry.testName}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.testName}
+                      </td>
                       <td className="border border-gray-300 p-2 text-center">
                         {entry.date
-                          ? `${entry.date.getDate().toString().padStart(2, "0")}/${(entry.date.getMonth() + 1)
+                          ? `${entry.date
+                              .getDate()
+                              .toString()
+                              .padStart(2, "0")}/${(entry.date.getMonth() + 1)
                               .toString()
                               .padStart(2, "0")}/${entry.date.getFullYear()}`
                           : "N/A"}
                       </td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.day}</td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.marksObtained}</td>
-                      <td className="border border-gray-300 p-2 text-center">{entry.totalMarks}</td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.day}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.marksObtained}
+                      </td>
+                      <td className="border border-gray-300 p-2 text-center">
+                        {entry.totalMarks}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
-  
+
                 {/* Repeat similar structure for Chemistry, Maths, and Biology sections */}
               </table>
             </div>
           ) : (
-            <div className="text-center text-gray-500">No report available.</div>
+            <div className="text-center text-gray-500">
+              No report available.
+            </div>
           )}
         </div>
       ) : (
@@ -644,9 +710,6 @@ const ReportPage = () => {
       )}
     </div>
   );
-  
-  
-  
 };
 
 export default ReportPage;
