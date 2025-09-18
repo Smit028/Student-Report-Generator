@@ -69,7 +69,7 @@ const ReportPage = () => {
   "Sagar",
   "Bhavesh",
   "Ayush"
-];
+]
 
 
   const fetchStudentData = (studentId, fetchedData, tree) => {
