@@ -35,13 +35,13 @@ export default function Home() {
     className="cursor-pointer flex-col items-center justify-center shadow-2xl whitespace-nowrap text-2xl p-6 lg:p-8 lg:w-1/4"
     gradientColor={"#D9D9D955"}
   >
-    12th Gujarati
+   <Link href="/tem" passHref>  12th Gujarati</Link>
   </MagicCard>
   <MagicCard
     className="cursor-pointer flex-col items-center justify-center shadow-2xl whitespace-nowrap text-2xl p-6 lg:p-8 lg:w-1/4"
     gradientColor={"#D9D9D955"}
   >
-    11th English
+    <Link href="/tem" passHref> 11th English </Link>
   </MagicCard>
   <MagicCard
     className="cursor-pointer flex-col items-center justify-center shadow-2xl whitespace-nowrap text-2xl p-6 lg:p-8 lg:w-1/4"
