@@ -268,15 +268,14 @@ const names = [
   //   fetchbioStudentData(studentIds[1], data, e.target.value);
   // };
 
-  const handleStudentChange = (e) => {
+ const handleStudentChange = (e) => {
   const selectedName = e.target.value;
   setSelectedStudentId(selectedName);
 
   const studentIds = Object.keys(data);
-
-  // Find the student ID that contains this name
   let foundStudentId = null;
 
+  // You have only 1 student ID in your structure
   for (const id of studentIds) {
     if (data[id]?.Sheet1?.[selectedName]) {
       foundStudentId = id;
@@ -285,11 +284,11 @@ const names = [
   }
 
   if (!foundStudentId) {
-    setError("No student found with this name");
+    setError("No student found");
     return;
   }
 
-  // Load reports
+  // Load reports for the correct ID
   fetchStudentData(foundStudentId, data, selectedName);
   fetchchemStudentData(foundStudentId, data, selectedName);
   fetchmathStudentData(foundStudentId, data, selectedName);
