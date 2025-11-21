@@ -259,14 +259,43 @@ const names = [
     fetchData();
   }, []);
 
+  // const handleStudentChange = (e) => {
+  //   const studentIds = Object.keys(data);
+  //   setSelectedStudentId(e.target.value);
+  //   fetchStudentData(studentIds[1], data, e.target.value);
+  //   fetchchemStudentData(studentIds[1], data, e.target.value);
+  //   fetchmathStudentData(studentIds[1], data, e.target.value);
+  //   fetchbioStudentData(studentIds[1], data, e.target.value);
+  // };
+
   const handleStudentChange = (e) => {
-    const studentIds = Object.keys(data);
-    setSelectedStudentId(e.target.value);
-    fetchStudentData(studentIds[1], data, e.target.value);
-    fetchchemStudentData(studentIds[1], data, e.target.value);
-    fetchmathStudentData(studentIds[1], data, e.target.value);
-    fetchbioStudentData(studentIds[1], data, e.target.value);
-  };
+  const selectedName = e.target.value;
+  setSelectedStudentId(selectedName);
+
+  const studentIds = Object.keys(data);
+
+  // Find the student ID that contains this name
+  let foundStudentId = null;
+
+  for (const id of studentIds) {
+    if (data[id]?.Sheet1?.[selectedName]) {
+      foundStudentId = id;
+      break;
+    }
+  }
+
+  if (!foundStudentId) {
+    setError("No student found with this name");
+    return;
+  }
+
+  // Load reports
+  fetchStudentData(foundStudentId, data, selectedName);
+  fetchchemStudentData(foundStudentId, data, selectedName);
+  fetchmathStudentData(foundStudentId, data, selectedName);
+  fetchbioStudentData(foundStudentId, data, selectedName);
+};
+
 
   const downloadReport = () => {
     try {
